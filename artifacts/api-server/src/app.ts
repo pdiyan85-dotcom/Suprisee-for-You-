@@ -6,18 +6,19 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+app.use(cors());
 app.use(
-  pinoHttp({
+  (pinoHttp as any)({
     logger,
     serializers: {
-      req(req) {
+      req(req: any) {
         return {
           id: req.id,
           method: req.method,
           url: req.url?.split("?")[0],
         };
       },
-      res(res) {
+      res(res: any) {
         return {
           statusCode: res.statusCode,
         };
@@ -28,6 +29,26 @@ app.use(
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.get("/", (_req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Goodies Box</title>
+        <meta http-equiv="refresh" content="0; url=/index.html" />
+        <style>
+          body { font-family: system-ui, sans-serif; text-align: center; padding: 50px; background: #0f172a; color: white; }
+          a { color: #38bdf8; text-decoration: none; font-weight: bold; font-size: 1.2rem; }
+        </style>
+      </head>
+      <body>
+        <h1>🎁 Goodies Box App</h1>
+        <p><a href="/index.html">Click here to open Goodies Box Application</a></p>
+      </body>
+    </html>
+  `);
+});
 
 app.use("/api", router);
 
